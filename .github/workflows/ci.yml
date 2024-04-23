@@ -1,43 +1,34 @@
-name: Windows CI Pipeline
+name: Auto Update and Push
 
-# Trigger the workflow on pushes to the main branch and pull requests
+# Trigger on manual workflow dispatch
 on:
-  push:
-    branches:
-      - main
-  pull_request:
-    branches:
-      - main
+  workflow_dispatch:
 
 jobs:
-  build:
+  update:
     runs-on: windows-latest
 
     steps:
-      # Step 1: Checkout the repository
+      # Step 1: Checkout repository
       - name: Checkout Repository
         uses: actions/checkout@v3
 
-      # Step 2: Set up Python on Windows
-      - name: Set Up Python
-        uses: actions/setup-python@v4
-        with:
-          python-version: '3.10'
-
-      # Step 3: Create and activate a virtual environment
-      - name: Create Virtual Environment
+      # Step 2: Make a change to a file (e.g., update a README with a timestamp)
+      - name: Make Change
         run: |
-          python -m venv venv
-          venv\Scripts\activate.bat
+          echo "Last updated: $(date)" >> README.md
 
-      # Step 4: Install project dependencies
-      - name: Install Dependencies
+      # Step 3: Commit the changes
+      - name: Commit Changes
         run: |
-          venv\Scripts\activate.bat
-          pip install -r requirements.txt
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add .
+          git commit -m "Update README with timestamp"
 
-      # Step 5: Run automated tests using pytest
-      - name: Run Tests
+      # Step 4: Push the changes back to GitHub
+      - name: Push Changes
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
-          venv\Scripts\activate.bat
-          pytest
+          git push origin main

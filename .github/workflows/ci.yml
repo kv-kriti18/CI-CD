@@ -1,0 +1,43 @@
+name: Windows CI Pipeline
+
+# Trigger the workflow on pushes to the main branch and pull requests
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+    branches:
+      - main
+
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+      # Step 1: Checkout the repository
+      - name: Checkout Repository
+        uses: actions/checkout@v3
+
+      # Step 2: Set up Python on Windows
+      - name: Set Up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.10'
+
+      # Step 3: Create and activate a virtual environment
+      - name: Create Virtual Environment
+        run: |
+          python -m venv venv
+          venv\Scripts\activate.bat
+
+      # Step 4: Install project dependencies
+      - name: Install Dependencies
+        run: |
+          venv\Scripts\activate.bat
+          pip install -r requirements.txt
+
+      # Step 5: Run automated tests using pytest
+      - name: Run Tests
+        run: |
+          venv\Scripts\activate.bat
+          pytest
